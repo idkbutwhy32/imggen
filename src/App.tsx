@@ -1,0 +1,128 @@
+import { useState } from 'react';
+import { Sparkles, Loader2 } from 'lucide-react';
+
+function App() {
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [error, setError] = useState<string>('');
+
+  const generateRandomImage = async () => {
+    setLoading(true);
+    setError('');
+
+    const prompts = [
+      'A serene mountain landscape at golden hour with dramatic clouds and snow-capped peaks',
+      'A futuristic cyberpunk cityscape at night with neon lights and flying vehicles',
+      'An enchanted magical forest with bioluminescent mushrooms and glowing fireflies',
+      'An underwater coral reef scene with colorful tropical fish and sea turtles',
+      'A cozy vintage coffee shop interior on a rainy day with warm lighting',
+      'A majestic space station orbiting a ringed planet with distant galaxies',
+      'A beautiful Japanese garden in spring with cherry blossoms and koi pond',
+      'A powerful dragon with iridescent scales soaring through storm clouds',
+      'A peaceful lakeside cabin in autumn surrounded by colorful fall foliage',
+      'A vibrant bustling Asian night market with food stalls and paper lanterns',
+      'An ancient Egyptian temple at sunset with massive stone pillars',
+      'A whimsical candy land with lollipop trees and chocolate rivers',
+      'A steampunk airship flying through clouds with brass gears and propellers',
+      'A mystical northern lights aurora borealis over a snowy landscape',
+      'A tropical beach paradise at sunset with palm trees and turquoise water',
+      'An alien planet landscape with strange rock formations and multiple moons',
+      'A medieval castle on a cliff overlooking the sea during stormy sunset',
+      'A cozy library with floor-to-ceiling bookshelves and warm fireplace',
+      'A vintage 1950s American diner at night with chrome fixtures and neon signs',
+      'A peaceful zen garden with carefully raked sand patterns and bamboo'
+    ];
+
+    try {
+      const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+      const timestamp = Date.now();
+      const newImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(randomPrompt)}?width=800&height=600&nologo=true&seed=${timestamp}`;
+
+      setImageLoading(true);
+      setImageUrl(newImageUrl);
+    } catch (err) {
+      setError('Failed to generate image. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+  };
+
+  const handleImageError = () => {
+    setImageLoading(false);
+    setError('Failed to load image. Please try again.');
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-6">
+      <div className="max-w-3xl w-full bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3">
+            <Sparkles className="text-yellow-400" size={36} />
+            AI Image Generator
+          </h1>
+          <p className="text-gray-300">Click the button to generate a random AI image</p>
+        </div>
+
+        <button
+          onClick={generateRandomImage}
+          disabled={loading}
+          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 mb-8"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="animate-spin" size={24} />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Sparkles size={24} />
+              Generate Random Image
+            </>
+          )}
+        </button>
+
+        {error && (
+          <div className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
+
+        {imageUrl && (
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 relative">
+            {imageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/5 rounded-xl backdrop-blur-sm z-10">
+                <div className="text-center">
+                  <Loader2 className="animate-spin text-purple-400 mx-auto mb-3" size={48} />
+                  <p className="text-gray-300 font-medium">Loading image...</p>
+                </div>
+              </div>
+            )}
+            <img
+              src={imageUrl}
+              alt="Generated by AI"
+              className="w-full h-auto rounded-lg shadow-xl"
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+            />
+          </div>
+        )}
+
+        {!imageUrl && !loading && (
+          <div className="bg-white/5 rounded-xl p-12 border border-white/10 border-dashed flex items-center justify-center">
+            <p className="text-gray-400 text-center">
+              Your generated image will appear here
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default App;
